@@ -9,6 +9,7 @@ import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
 import FilledButton from "../../components/buttons/FilledButton";
 import { toast } from "react-toastify";
+import { MESSAGE_SWITCH_NETWORK } from "../../utils/constants";
 
 // -----------------------------------------------------------------------------------------
 
@@ -81,7 +82,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (chain?.id !== Number(chainId)) {
-      toast.warn('Please switch network to Linea Goerli testnet.')
+      toast.warn(MESSAGE_SWITCH_NETWORK)
     }
   }, [chain?.id])
 

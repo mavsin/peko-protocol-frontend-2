@@ -1259,3 +1259,4 @@ export const ADMIN_WALLETS = [
 ];
 export const NUMBER_OF_LIQUIDATIONS_PER_PAGE = 100;
 export const DEFAULT_LTV = 0.8;
+export const MESSAGE_SWITCH_NETWORK = "Please switch to Linea Goerli testnet.";

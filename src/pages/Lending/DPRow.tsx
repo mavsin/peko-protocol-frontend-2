@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useBalance, useContractRead, useNetwork } from "wagmi";
 import { formatEther, formatUnits } from "viem";
 import Td from "../../components/tableComponents/Td";
 import Tr from "../../components/tableComponents/Tr";
@@ -58,7 +58,7 @@ export default function DPRow({ asset, openDialog, ethPriceInUsd, usdcPriceInUsd
   //  ----------------------------------------------------------------------------------
 
   //  Get market size, total borrowed, deposit APY, and borrow APY.
-  
+
   useEffect(() => {
     if (poolInfo) {
       setMarketSize(Number(formatEther(poolInfo.totalAmount)))

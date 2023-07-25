@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useMediaQuery } from 'react-responsive';
 import { List } from "@material-tailwind/react";
 import { toast } from "react-toastify";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import InfoCard from "../../components/cards/InfoCard";
@@ -13,7 +13,7 @@ import PrimaryBoard from "../../components/boards/PrimaryBoard";
 import Th from "../../components/tableComponents/Th";
 import ProgressBar from "../../components/ProgressBar";
 import Table from "../../components/tableComponents/Table";
-import { ASSETS, DEFAULT_LTV, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { ASSETS, DEFAULT_LTV, MESSAGE_SWITCH_NETWORK, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { IAsset, IReturnValueOfCalcTokenPrice, IReturnValueOfGetMarketInfo, IReturnValueOfPools, IReturnValueOfUserInfo } from "../../utils/interfaces";
 import DPRow from "./DPRow";
 import MBRow from "./MBRow";
@@ -27,10 +27,15 @@ const DepositBoard = lazy(() => import('./DepositBoard'))
 
 // -----------------------------------------------------------------------------------
 
+const chainId = process.env.REACT_APP_CHAIN_ID
+
+// -----------------------------------------------------------------------------------
+
 export default function Lending() {
   //  Context hooks -----------------------------------------------------
   const isMobile = useMediaQuery({ maxWidth: 1024 });
   const { isConnected, address } = useAccount();
+  const { chain } = useNetwork()
 
   //  States  -----------------------------------------------------------
   const [dialogVisible, setDialogVisible] = useState<boolean>(false)
@@ -91,7 +96,10 @@ export default function Lending() {
   const openDialog = (_asset: IAsset) => {
     setSelectedAsset(_asset)
     if (isConnected) {
-      return setDialogVisible(true);
+      if (chain?.id === Number(chainId)) {
+        return setDialogVisible(true);
+      }
+      return toast.warn(MESSAGE_SWITCH_NETWORK);
     } else {
       return toast.info('Please connect your wallet.');
     }
