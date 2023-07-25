@@ -1,14 +1,14 @@
 import { ChangeEvent, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { formatUnits } from "viem";
+import Slider from "rc-slider";
 import CustomDialog from "../../../components/dialogs/CustomDialog";
 import MainInput from "../../../components/form/MainInput";
 import { IPropsOfCustomDialog, IUserInfo } from "../../../utils/interfaces";
 import { IN_PROGRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
-import Slider from "rc-slider";
 import FilledButton from "../../../components/buttons/FilledButton";
-import { formatUnits } from "viem";
 
 // ---------------------------------------------------------------------------------------------
 
