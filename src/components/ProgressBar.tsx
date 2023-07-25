@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Progress } from '@material-tailwind/react'
-import { IPropsOfComponent } from "../utils/interfaces";
 import { color } from '@material-tailwind/react/types/components/progress';
+import { IPropsOfComponent } from "../utils/interfaces";
 
 // -----------------------------------------------------------------------------------
 
