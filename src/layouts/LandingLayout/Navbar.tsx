@@ -81,10 +81,12 @@ export default function Navbar() {
   }
 
   useEffect(() => {
-    if (chain?.id !== Number(chainId)) {
-      toast.warn(MESSAGE_SWITCH_NETWORK)
+    if (isConnected) {
+      if (chain?.id !== Number(chainId)) {
+        toast.warn(MESSAGE_SWITCH_NETWORK)
+      }
     }
-  }, [chain?.id])
+  }, [chain?.id, isConnected])
 
   return (
     <nav className="sticky top-0 bg-gray-900 border-b border-gray-800 z-[99]">
