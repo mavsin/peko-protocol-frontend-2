@@ -42,7 +42,13 @@ function App() {
             </MobileMenuProvider>
           </LoadingProvider>
         </WagmiConfig>
-        <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
+        <Web3Modal
+          projectId={projectId}
+          ethereumClient={ethereumClient}
+          explorerRecommendedWalletIds={[
+            '971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709'
+          ]}
+        />
       </Suspense>
     </BrowserRouter>
   );
