@@ -1,4 +1,4 @@
-// import { useState } from "react";
+import { useMemo } from "react";
 import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { useMediaQuery } from "react-responsive";
 import { formatUnits } from "viem";
@@ -53,6 +53,17 @@ export default function PekoSection({ userInfo }: IProps) {
 
   //  --------------------------------------------------------------------
 
+  const isValidClaim = useMemo<boolean>(() => {
+    if (pekoBalanceDataOfWallet) {
+      if (Number(pekoBalanceDataOfWallet.formatted) > 0) {
+        return true
+      }
+    }
+    return false
+  }, [pekoBalanceDataOfWallet])
+
+  //  --------------------------------------------------------------------
+
   return (
     <Section title="Peko">
       {isMobile ? (
@@ -76,14 +87,14 @@ export default function PekoSection({ userInfo }: IProps) {
             {/* Wallet Balance */}
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Wallet Balance: </span>
-              <span>{Number(pekoBalanceDataOfWallet?.formatted).toFixed(2)} PEKO</span>
+              <span>{pekoBalanceDataOfWallet?.formatted} PEKO</span>
             </div>
 
             {/* Operation */}
             <div className="flex justify-between w-full">
               <span className="text-gray-500 font-bold">Oepration: </span>
               <FilledButton
-                disabled={!claimPeko || claimPekoIsLoading}
+                disabled={!claimPeko || claimPekoIsLoading || !isValidClaim}
                 onClick={() => claimPeko?.()}
               >
                 Claim
@@ -118,7 +129,7 @@ export default function PekoSection({ userInfo }: IProps) {
               </Td>
               <Td>
                 <FilledButton
-                  disabled={!claimPeko || claimPekoIsLoading}
+                  disabled={!claimPeko || claimPekoIsLoading || !isValidClaim}
                   onClick={() => claimPeko?.()}
                 >
                   Claim
