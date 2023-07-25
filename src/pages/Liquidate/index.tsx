@@ -1,9 +1,8 @@
 import { lazy, useEffect, useMemo, useState } from "react";
-import { ButtonGroup, List } from "@material-tailwind/react";
+import { List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
 import { useContractRead } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
-import { Icon } from "@iconify/react";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
@@ -152,6 +151,12 @@ export default function Liquidate() {
       }
     }
   }, [listOfUsers, currentPage])
+
+  useEffect(() => {
+    if (numberOfUsers === 0) {
+      setLiquidations([])
+    }
+  }, [numberOfUsers])
 
   //  ----------------------------------------------------------------
 

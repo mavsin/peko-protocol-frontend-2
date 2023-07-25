@@ -58,6 +58,8 @@ export default function Lending() {
     watch: true
   })
 
+  console.log('>>>>>>>>> ethPriceInBigInt => ', ethPriceInBigInt)
+
   //  Get the price of ethereum in USD.
   const { data: usdcPriceInBigInt }: IReturnValueOfCalcTokenPrice = useContractRead({
     address: POOL_CONTRACT_ADDRESS,

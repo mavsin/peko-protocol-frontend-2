@@ -74,31 +74,6 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
 
   //  -------------------------------------------------------------------------------
 
-  // const liquidations = useMemo<Array<ILiquidation>>(() => {
-  //   if (listOfUsers) {
-  //     let _liquidations = [];
-
-  //     for (let i = 0; i < listOfUsers.length; i += 1) {
-  //       if (address === listOfUsers[i].accountAddress) {
-  //         if (listOfUsers[i].ethBorrowAmount || listOfUsers[i].usdtBorrowAmount) {
-  //           let depositedValueInUsd = Number(formatEther(listOfUsers[i].ethDepositAmount + listOfUsers[i].ethRewardAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtDepositAmount + listOfUsers[i].usdtDepositAmount, USDC_DECIMAL)) * usdcPriceInUsd
-  //           let borrowedValueInUsd = Number(formatEther(listOfUsers[i].ethBorrowAmount + listOfUsers[i].ethInterestAmount)) * ethPriceInUsd + Number(formatUnits(listOfUsers[i].usdtBorrowAmount + listOfUsers[i].usdtInterestAmount, USDC_DECIMAL)) * usdcPriceInUsd
-
-  //           if (depositedValueInUsd > 0) {
-  //             let riskFactor = borrowedValueInUsd / (depositedValueInUsd * 0.9) * 100
-  //             if (riskFactor > Number(liquidatationThresholdInBigInt)) {
-  //               _liquidations.push({ ...listOfUsers[i], riskFactor })
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     return _liquidations
-  //   }
-  //   return []
-  // }, [listOfUsers])
-
   //  The threshold of liquidation
   const liquidationThreshold = useMemo<number>(() => {
     if (liquidatationThresholdInBigInt) {
@@ -147,6 +122,12 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
       }
     }
   }, [listOfUsers, currentPage])
+
+  useEffect(() => {
+    if (numberOfUsers === 0) {
+      setLiquidations([])
+    }
+  }, [numberOfUsers])
 
   //  -------------------------------------------------------------------------------
 

@@ -29,7 +29,7 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'getProfit',
-    args: [asset.contractAddress, parseUnits(amount, asset.decimals)],
+    args: [asset.contractAddress],
     watch: true
   })
 
@@ -38,6 +38,7 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
     address: POOL_CONTRACT_ADDRESS,
     abi: POOL_CONTRACT_ABI,
     functionName: 'claimProfit',
+    args: [asset.contractAddress, parseUnits(amount, asset.decimals)]
   })
   const { write: claimProfit, data: claimProfitData } = useContractWrite(configOfClaimProfit);
   const { isLoading: claimProfitIsLoading } = useWaitForTransaction({
@@ -62,6 +63,7 @@ export default function ClaimProfitDialog({ visible, setVisible, asset }: IProps
   }, [amount])
 
   const maxAmount = useMemo<number>(() => {
+    console.log('>>>>>>>>> profitInBigint => ', profitInBigint)
     if (profitInBigint) {
       return Number(formatUnits(profitInBigint, asset.decimals))
     }
