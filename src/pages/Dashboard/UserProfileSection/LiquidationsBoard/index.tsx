@@ -1,11 +1,12 @@
 import { lazy, useEffect, useMemo, useState } from "react";
 import { formatEther, formatUnits } from "viem";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 import PrimaryBoard from "../../../../components/boards/PrimaryBoard";
 import Table from "../../../../components/tableComponents/Table";
 import Th from "../../../../components/tableComponents/Th";
 import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfListOfUsers, IUserInfo } from "../../../../utils/interfaces";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
+import { MESSAGE_SWITCH_NETWORK, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../../utils/constants";
+import { toast } from "react-toastify";
 
 //  -----------------------------------------------------------------------------------------
 
@@ -22,7 +23,14 @@ interface IProps {
 
 //  -----------------------------------------------------------------------------------------
 
+const chainId = process.env.REACT_APP_CHAIN_ID
+
+//  -----------------------------------------------------------------------------------------
+
 export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceInUsd }: IProps) {
+  const { chain } = useNetwork()
+  //  -------------------------------------------------------------------------------
+
   const [selectedLiquidation, setSelectedLiquidation] = useState<ILiquidation | null>(null)
   const [liquidateDialogOpened, setLiquidateDialogOpened] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState<number>(0)
@@ -63,8 +71,12 @@ export default function LiquidationsBoard({ userInfo, ethPriceInUsd, usdcPriceIn
   //  -------------------------------------------------------------------------------
 
   const openLiquidateDialog = (liquidation: ILiquidation) => {
-    setSelectedLiquidation(liquidation)
-    setLiquidateDialogOpened(true)
+    if (chain?.id === Number(chainId)) {
+      setSelectedLiquidation(liquidation)
+      setLiquidateDialogOpened(true)
+    } else {
+      toast.warn(MESSAGE_SWITCH_NETWORK)
+    }
   }
 
   const closeLiquidateDialog = () => {

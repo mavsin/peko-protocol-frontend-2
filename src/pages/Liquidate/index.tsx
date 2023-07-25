@@ -1,13 +1,14 @@
 import { lazy, useEffect, useMemo, useState } from "react";
 import { List } from "@material-tailwind/react";
 import { useMediaQuery } from "react-responsive";
-import { useContractRead } from "wagmi";
+import { useContractRead, useNetwork } from "wagmi";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
 import Container from "../../components/containers/Container";
 import Table from "../../components/tableComponents/Table";
 import Th from "../../components/tableComponents/Th";
-import { POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
+import { MESSAGE_SWITCH_NETWORK, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, USDC_CONTRACT_ADDRESS, USDC_DECIMAL, WETH_CONTRACT_ADDRESS } from "../../utils/constants";
 import { ILiquidation, IReturnValueOfAllowance, IReturnValueOfCalcTokenPrice, IReturnValueOfListOfUsers } from "../../utils/interfaces";
+import { toast } from "react-toastify";
 
 // -----------------------------------------------------------------------------------
 
@@ -17,8 +18,13 @@ const LiquidateDialog = lazy(() => import('../../components/LiquidateDialog'))
 
 // -----------------------------------------------------------------------------------
 
+const chainId = process.env.REACT_APP_CHAIN_ID
+
+// -----------------------------------------------------------------------------------
+
 export default function Liquidate() {
   const isMobile = useMediaQuery({ maxWidth: 1024 });
+  const { chain } = useNetwork()
 
   //  ----------------------------------------------------------------
 
@@ -117,8 +123,12 @@ export default function Liquidate() {
   //  ----------------------------------------------------------------
 
   const openLiquidateDialog = (liquidation: ILiquidation) => {
-    setSelectedLiquidation(liquidation)
-    setLiquidateDialogOpened(true)
+    if (chain?.id === Number(chainId)) {
+      setSelectedLiquidation(liquidation)
+      setLiquidateDialogOpened(true)
+    } else {
+      toast.warn(MESSAGE_SWITCH_NETWORK)
+    }
   }
 
   const closeLiquidateDialog = () => {

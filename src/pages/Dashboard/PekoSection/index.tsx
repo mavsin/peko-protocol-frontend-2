@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAccount, useBalance, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useAccount, useBalance, useContractWrite, useNetwork, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { useMediaQuery } from "react-responsive";
 import { formatUnits } from "viem";
 import { toast } from "react-toastify";
@@ -8,7 +8,7 @@ import Th from "../../../components/tableComponents/Th";
 import Section from "../../../components/Section";
 import Td from "../../../components/tableComponents/Td";
 import { IUserInfo } from "../../../utils/interfaces";
-import { PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../utils/constants";
+import { MESSAGE_SWITCH_NETWORK, PEKO_CONTRACT_ADDRESS, PEKO_DECIMAL, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS } from "../../../utils/constants";
 import FilledButton from "../../../components/buttons/FilledButton";
 // import ClaimPekoDialog from "./ClaimPekoDialog";
 
@@ -20,9 +20,14 @@ interface IProps {
 
 //  ------------------------------------------------------------------------------------------------------
 
+const chainId = process.env.REACT_APP_CHAIN_ID
+
+//  ------------------------------------------------------------------------------------------------------
+
 export default function PekoSection({ userInfo }: IProps) {
   const isMobile = useMediaQuery({ maxWidth: 640 })
   const { address } = useAccount()
+  const { chain } = useNetwork()
 
   // const [dialogVisible, setDialogVisible] = useState<boolean>(false)
 
@@ -64,6 +69,14 @@ export default function PekoSection({ userInfo }: IProps) {
 
   //  --------------------------------------------------------------------
 
+  const handleClaimPeko = () => {
+    if (chain?.id === Number(chainId)) {
+      claimPeko?.()
+    } else {
+      toast.warn(MESSAGE_SWITCH_NETWORK)
+    }
+  }
+
   return (
     <Section title="Peko">
       {isMobile ? (
@@ -95,7 +108,7 @@ export default function PekoSection({ userInfo }: IProps) {
               <span className="text-gray-500 font-bold">Oepration: </span>
               <FilledButton
                 disabled={!claimPeko || claimPekoIsLoading || !isValidClaim}
-                onClick={() => claimPeko?.()}
+                onClick={() => handleClaimPeko()}
               >
                 Claim
               </FilledButton>
