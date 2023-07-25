@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from '@iconify/react';
 import { useWeb3Modal } from "@web3modal/react"
@@ -8,6 +8,7 @@ import Container from "../../components/containers/Container";
 import TextButton from "../../components/buttons/TextButton";
 import TextIconButton from "../../components/buttons/TextIconButton";
 import FilledButton from "../../components/buttons/FilledButton";
+import { toast } from "react-toastify";
 
 // -----------------------------------------------------------------------------------------
 
@@ -77,6 +78,12 @@ export default function Navbar() {
     navigate(to)
     closeDrawer()
   }
+
+  useEffect(() => {
+    if (chain?.id !== Number(chainId)) {
+      toast.warn('Please switch network to Linea Goerli testnet.')
+    }
+  }, [chain?.id])
 
   return (
     <nav className="sticky top-0 bg-gray-900 border-b border-gray-800 z-[99]">
