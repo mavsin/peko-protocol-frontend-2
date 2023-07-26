@@ -203,11 +203,11 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
             <span className="text-gray-500">Wallet</span>
             <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
           </div>
-          {/* <div className="flex items-center justify-between">
-            <span className="text-gray-500">APY</span>
-            <span className="text-gray-100">1.19%</span>
-          </div>
           <div className="flex items-center justify-between">
+            <span className="text-gray-500">Fee</span>
+            <span className="text-gray-100">0.5%</span>
+          </div>
+          {/* <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
             <span className="text-gray-100">2.89039 USDC</span>
           </div> */}
