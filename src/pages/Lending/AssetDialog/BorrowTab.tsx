@@ -38,9 +38,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
     functionName: 'borrow',
     args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
   })
-
   const { write: borrow, data: borrowData } = useContractWrite(borrowConfig)
-
   const { isLoading: borrowIsLoading, isError: borrowIsError, isSuccess: borrowIsSuccess } = useWaitForTransaction({
     hash: borrowData?.hash
   })
@@ -49,7 +47,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
 
   const maxAmount = useMemo<number>(() => {
     if (asset.symbol === 'eth' && ethPriceInUsd > 0) {
-      return Number(Number(maxAmountInUsd / ethPriceInUsd).toFixed(4))
+      return Number(Number(maxAmountInUsd / ethPriceInUsd).toFixed(6))
     }
     if (asset.symbol === 'usdc' && usdcPriceInUsd > 0) {
       return Number((maxAmountInUsd / usdcPriceInUsd).toFixed(USDC_DECIMAL))
@@ -83,7 +81,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   }
 
   const handleHalf = () => {
-    setAmount(`${(maxAmount / 2).toFixed(4)}`)
+    setAmount(`${(maxAmount / 2).toFixed(6)}`)
   }
 
   const handleMax = () => {
@@ -91,7 +89,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${(value * maxAmount / 100).toFixed(4)}`)
+    setAmount(`${(value * maxAmount / 100).toFixed(6)}`)
   }
 
   //  ----------------------------------------------------------------------------
@@ -138,7 +136,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
       />
 
       <div className="flex items-center justify-between">
-        <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+        <p className="text-gray-500">Max: {maxAmount.toFixed(6)} <span className="uppercase">{asset.symbol}</span></p>
         <div className="flex items-center gap-2">
           <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
           <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
@@ -167,8 +165,8 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
           <span className="text-gray-500">Deposited</span>
           <span className="text-gray-100 uppercase">
             {userInfo && balanceData ? asset.symbol === 'eth' ?
-              Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-              Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(4) : ''}&nbsp;
+              Number(formatEther((userInfo.ethDepositAmount))).toFixed(6) :
+              Number(formatUnits((userInfo.usdtDepositAmount), balanceData.decimals)).toFixed(6) : ''}&nbsp;
             {asset.symbol}
           </span>
         </div>
@@ -178,7 +176,7 @@ export default function BorrowTab({ asset, setVisible, balanceData, userInfo, po
         </div>
         <div className="flex items-center justify-between">
           <span className="text-gray-500">Wallet</span>
-          <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
+          <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(6)} {asset.symbol}</span>
         </div>
       </div>
 

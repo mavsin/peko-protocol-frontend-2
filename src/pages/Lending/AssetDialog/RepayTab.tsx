@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { DELAY_TIME, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
+import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -26,7 +26,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [maxAmount, setMaxAmount] = useState<string>('0');
   const [approved, setApproved] = useState<boolean>(false);
-  const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
+  // const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
 
   const { address } = useAccount()
 
@@ -49,9 +49,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
-      setTimeout(() => {
-        setApproved(true)
-      }, DELAY_TIME)
+      setApproved(true)
     },
     onError: () => {
       setApproved(false)
@@ -99,20 +97,24 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   }
 
   const handleMaxAmount = () => {
-    setAmount(Number(maxAmount).toFixed(4))
+    setAmount(Number(maxAmount).toFixed(6))
   }
 
   const handleHalfAmount = () => {
-    setAmount(`${(Number(maxAmount) / 2).toFixed(4)}`)
+    setAmount(`${(Number(maxAmount) / 2).toFixed(6)}`)
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(4)}`)
+    setAmount(`${Number(value * Number(maxAmount) / 100).toFixed(6)}`)
   }
 
   const handleUsdcRepay = () => {
-    if (approvedUsdc >= Number(amount) && repay) {
-      repay()
+    if (approvedUsdc >= Number(amount)) {
+      if (repay) {
+        repay()
+      } else {
+        toast.info('Please reopen the dialog and try again.')
+      }
     } else {
       setApproved(false)
       toast.warn(`Please approve ${Number(amount)} USDC.`)
@@ -124,6 +126,8 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   const amountIsValid = useMemo<boolean>(() => {
     const amountInNumber = Number(amount);
     const maxAmountInNumber = Number(maxAmount);
+    console.log('>>>>>>>>> amountInNumber => ', amountInNumber)
+    console.log('>>>>>>>>> maxAmountInNumber => ', maxAmountInNumber)
     if (amountInNumber !== 0) {
       if (amountInNumber <= maxAmountInNumber) {
         return true;
@@ -180,22 +184,24 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
   // }, [approvedUsdc, amount, asset])
 
   useEffect(() => {
-    if (repayIsPrepared) {
-      setApproved(true)
-    } else {
-      setApproved(false)
+    if (asset.symbol === 'usdc') {
+      if (repayIsPrepared) {
+        setApproved(true)
+      } else {
+        setApproved(false)
+      }
     }
-  }, [repayIsPrepared])
+  }, [repayIsPrepared, asset.symbol])
 
-  useEffect(() => {
-    if (approveIsLoading) {
-      setApproveIsLoadingDelayed(true)
-    } else {
-      setTimeout(() => {
-        setApproveIsLoadingDelayed(false)
-      }, DELAY_TIME)
-    }
-  }, [approveIsLoading])
+  // useEffect(() => {
+  //   if (approveIsLoading) {
+  //     setApproveIsLoadingDelayed(true)
+  //   } else {
+  //     setTimeout(() => {
+  //       setApproveIsLoadingDelayed(false)
+  //     }, DELAY_TIME)
+  //   }
+  // }, [approveIsLoading])
 
   //  --------------------------------------------------------------------------
 
@@ -210,7 +216,7 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+          <p className="text-gray-500">Max: {Number(maxAmount).toFixed(6)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalfAmount}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMaxAmount}>max</OutlinedButton>
@@ -271,10 +277,10 @@ export default function RepayTab({ asset, setVisible, balanceData, userInfo }: I
             ) : (
               <FilledButton
                 className="mt-8 py-2 text-base"
-                disabled={!approve || !amountIsValid || approveIsLoadingDelayed}
+                disabled={!approve || !amountIsValid || approveIsLoading}
                 onClick={() => approve?.()}
               >
-                {approveIsLoadingDelayed ? IN_PROGRESS : 'Approve'}
+                {approveIsLoading ? IN_PROGRESS : 'Approve'}
               </FilledButton>
             )}
           </>

@@ -1,14 +1,14 @@
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import Slider from "rc-slider";
 import { toast } from "react-toastify";
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
+import { useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther, formatUnits } from "viem";
 import MainInput from "../../../components/form/MainInput";
 import { IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
-import { IAsset, IBalanceData, IPoolInfo, IUserInfo } from "../../../utils/interfaces";
+import { IAsset, IBalanceData, IPoolInfo, IReturnValueOfAllowance, IUserInfo } from "../../../utils/interfaces";
 
 //  ----------------------------------------------------------------------------------------------------
 
@@ -31,6 +31,14 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
 
   //  --------------------------------------------------------------------
 
+  const { data: poolProfitInBigint }: IReturnValueOfAllowance = useContractRead({
+    address: POOL_CONTRACT_ADDRESS,
+    abi: POOL_CONTRACT_ABI,
+    functionName: 'getProfit',
+    args: [asset.contractAddress],
+    watch: true
+  })
+
   //  Withdraw
   const { config: withdrawConfig, isSuccess: withdrawPrepareIsSuccess } = usePrepareContractWrite({
     address: POOL_CONTRACT_ADDRESS,
@@ -38,9 +46,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
     functionName: 'withdraw',
     args: [asset.contractAddress, Number(amount) * 10 ** asset.decimals],
   })
-
   const { write: withdraw, data: withdrawData } = useContractWrite(withdrawConfig);
-
   const { isLoading: withdrawIsLoading, isError: withdrawIsError, isSuccess: withdrawIsSuccess } = useWaitForTransaction({
     hash: withdrawData?.hash
   })
@@ -78,6 +84,13 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
     return amount
   }, [amount])
 
+  const poolProfit = useMemo<number>(() => {
+    if (poolProfitInBigint) {
+      return Number(formatUnits(poolProfitInBigint, asset.decimals))
+    }
+    return 0
+  }, [poolProfitInBigint])
+
   //  --------------------------------------------------------------------
 
   const handleAmount = (e: ChangeEvent<HTMLInputElement>) => {
@@ -89,15 +102,15 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
   }
 
   const handleHalf = () => {
-    setAmount(`${(maxAmount / 2).toFixed(4)}`)
+    setAmount(`${(maxAmount / 2).toFixed(6)}`)
   }
 
   const handleMax = () => {
-    setAmount(maxAmount.toFixed(4))
+    setAmount(maxAmount.toFixed(6))
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${Number(value * maxAmount / 100).toFixed(4)}`)
+    setAmount(`${Number(value * maxAmount / 100).toFixed(6)}`)
   }
 
   //  --------------------------------------------------------------------
@@ -133,12 +146,8 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         }
 
         if (depositTokenInUsd > 0) {
-          console.log('>>>>>>>>>>> userInfo => ', userInfo)
-          console.log('>>>>>>>>>>> totalDepositInUsd => ', totalDepositInUsd)
-          console.log('>>>>>>>>>>> totalBorrowInUsd => ', totalBorrowInUsd)
           if (totalBorrowInUsd > 0) {
             let _maxValueInUsd = (totalDepositInUsd * Number(poolInfo.LTV) / 100 - totalBorrowInUsd) / (Number(poolInfo.LTV) / 100)
-            console.log('>>>>>>>>>>> _maxValueInUsd => ', _maxValueInUsd)
 
             if (_maxValueInUsd <= depositTokenInUsd) {
               setMaxAmountInUsd(_maxValueInUsd)
@@ -174,12 +183,15 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {maxAmount.toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+          <p className="text-gray-500">Max: {maxAmount.toFixed(6)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleHalf}>half</OutlinedButton>
             <OutlinedButton className="text-xs px-2 py-1" onClick={handleMax}>max</OutlinedButton>
           </div>
         </div>
+        {poolProfit <= 0 && (
+          <p className="text-red-500">You can't withdraw any fund since the profit of the pool is insufficient.</p>
+        )}
 
         <div className="mt-4 px-2">
           <Slider
@@ -201,7 +213,7 @@ export default function WithdrawTab({ asset, setVisible, balanceData, userInfo, 
         <div className="flex flex-col gap-2 text-sm mt-8">
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(6)} {asset.symbol}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Fee</span>

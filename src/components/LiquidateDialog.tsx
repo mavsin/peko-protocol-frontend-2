@@ -95,6 +95,8 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
     }
   })
 
+  console.log('>>>>>>>>>> parseEther(`${ethAmountToPay}`) => ', parseEther(`${ethAmountToPay}`))
+
   //  ---------------------------------------------------------------------------
 
   //  Eth amount of wallet
@@ -157,14 +159,16 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
   //  Get totalBorrow and totalDeposit of the liquidation
   useEffect(() => {
     if (liquidation) {
+      console.log('>>>>>>>>>> liquidation => ', liquidation)
+      console.log('>>>>>>>>>> Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)) => ', Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
       setEthAmountToPay(Number(formatEther(liquidation.ethBorrowAmount + liquidation.ethInterestAmount)))
-      if (Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) === 0) {
-        setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
-      } else {
-        setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
-      }
-      setEthAmountToGetPaid(Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)))
-      setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
+      // if (Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) === 0) {
+      //   setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
+      // } else {
+      //   setUsdcAmountToPay(Number((Number(formatUnits(liquidation.usdtBorrowAmount + liquidation.usdtInterestAmount, USDC_DECIMAL)) / 0.9999).toFixed(6)))
+      // }
+      // setEthAmountToGetPaid(Number(formatEther(liquidation.ethDepositAmount + liquidation.ethRewardAmount)))
+      // setUsdcAmountToGetPaid(Number(formatUnits(liquidation.usdtDepositAmount + liquidation.usdtRewardAmount, USDC_DECIMAL)))
     }
   }, [liquidation])
 
@@ -204,7 +208,7 @@ export default function LiquidateDialog({ visible, setVisible, closeLiquidateDia
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
                     <img src="/assets/images/ethereum.png" alt="" className="w-10" />
-                    <span className="text-gray-100 text-lg">{ethAmountToPay} ETH</span>
+                    {/* <span className="text-gray-100 text-lg">{ethAmountToPay} ETH</span> */}
                   </div>
                   {!ethIsSufficient && (
                     <span className="text-red-500">Insufficient ETH balance</span>

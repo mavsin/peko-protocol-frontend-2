@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { formatEther, formatUnits, parseEther } from "viem";
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import MainInput from "../../../components/form/MainInput";
-import { APY_DECIMAL, DELAY_TIME, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
+import { APY_DECIMAL, IN_PROGRESS, POOL_CONTRACT_ABI, POOL_CONTRACT_ADDRESS, REGEX_NUMBER_VALID, USDC_CONTRACT_ABI, USDC_CONTRACT_ADDRESS, USDC_DECIMAL } from "../../../utils/constants";
 import OutlinedButton from "../../../components/buttons/OutlinedButton";
 import FilledButton from "../../../components/buttons/FilledButton";
 import MoreInfo from "./MoreInfo";
@@ -26,7 +26,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   const [amount, setAmount] = useState<string>('0')
   const [moreInfoCollapsed, setMoreInfoCollapsed] = useState<boolean>(false)
   const [approved, setApproved] = useState<boolean>(false)
-  const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
+  // const [approveIsLoadingDelayed, setApproveIsLoadingDelayed] = useState<boolean>(false)
 
   //  -----------------------------------------------------
 
@@ -68,9 +68,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   const { isLoading: approveIsLoading } = useWaitForTransaction({
     hash: approveData?.hash,
     onSuccess: () => {
-      setTimeout(() => {
-        setApproved(true)
-      }, DELAY_TIME)
+      setApproved(true)
     },
     onError: () => {
       setApproved(false)
@@ -125,8 +123,12 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   //  -----------------------------------------------------
 
   const handleUsdcDeposit = () => {
-    if (approvedUsdc >= Number(amount) && deposit) {
-      deposit()
+    if (approvedUsdc >= Number(amount)) {
+      if (deposit) {
+        deposit()
+      } else {
+        toast.info('Please reopen the dialog and try again.')
+      }
     } else {
       setApproved(false)
       toast.warn(`Please approve ${Number(amount)} USDC.`)
@@ -144,28 +146,30 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
   }
 
   const handleSlider = (value: any) => {
-    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(4)}`)
+    setAmount(`${(value * Number(balanceData?.formatted) / 100).toFixed(6)}`)
   }
 
   //  -----------------------------------------------------
 
   useEffect(() => {
-    if (depositIsPrepared) {
-      setApproved(true)
-    } else {
-      setApproved(false)
+    if (asset.symbol === 'usdc') {
+      if (depositIsPrepared) {
+        setApproved(true)
+      } else {
+        setApproved(false)
+      }
     }
-  }, [depositIsPrepared])
+  }, [depositIsPrepared, asset.symbol])
 
-  useEffect(() => {
-    if (approveIsLoading) {
-      setApproveIsLoadingDelayed(true)
-    } else {
-      setTimeout(() => {
-        setApproveIsLoadingDelayed(false)
-      }, DELAY_TIME)
-    }
-  }, [approveIsLoading])
+  // useEffect(() => {
+  //   if (approveIsLoading) {
+  //     setApproveIsLoadingDelayed(true)
+  //   } else {
+  //     setTimeout(() => {
+  //       setApproveIsLoadingDelayed(false)
+  //     }, DELAY_TIME)
+  //   }
+  // }, [approveIsLoading])
 
   return (
     <>
@@ -178,15 +182,15 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
         />
 
         <div className="flex items-center justify-between">
-          <p className="text-gray-500">Max: {Number(balanceData?.formatted).toFixed(4)} <span className="uppercase">{asset.symbol}</span></p>
+          <p className="text-gray-500">Max: {Number(balanceData?.formatted).toFixed(6)} <span className="uppercase">{asset.symbol}</span></p>
           <div className="flex items-center gap-2">
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${(Number(balanceData?.formatted) / 2).toFixed(4)}`)}
+              onClick={() => setAmount(`${(Number(balanceData?.formatted) / 2).toFixed(6)}`)}
             >half</OutlinedButton>
             <OutlinedButton
               className="text-xs px-2 py-1"
-              onClick={() => setAmount(`${Number(balanceData?.formatted).toFixed(4)}`)}
+              onClick={() => setAmount(`${Number(balanceData?.formatted).toFixed(6)}`)}
             >max</OutlinedButton>
           </div>
         </div>
@@ -214,8 +218,8 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             <span className="text-gray-500">Deposited</span>
             <span className="text-gray-100 uppercase">
               {userInfo && balanceData ? asset.symbol === 'eth' ?
-                Number(formatEther((userInfo.ethDepositAmount))).toFixed(4) :
-                Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)).toFixed(4) : ''}&nbsp;
+                Number(formatEther((userInfo.ethDepositAmount))).toFixed(6) :
+                Number(formatUnits(userInfo.usdtDepositAmount, balanceData.decimals)).toFixed(6) : ''}&nbsp;
               {asset.symbol}
             </span>
           </div>
@@ -225,7 +229,7 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-500">Wallet</span>
-            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(4)} {asset.symbol}</span>
+            <span className="text-gray-100 uppercase">{Number(balanceData?.formatted).toFixed(6)} {asset.symbol}</span>
           </div>
         </div>
 
@@ -250,10 +254,10 @@ export default function DepositTab({ asset, setVisible, balanceData, userInfo, p
             ) : (
               <FilledButton
                 className="mt-8 py-2 text-base"
-                disabled={!approve || !amountIsValid || approveIsLoadingDelayed}
+                disabled={!approve || !amountIsValid || approveIsLoading}
                 onClick={() => approve?.()}
               >
-                {approveIsLoadingDelayed ? IN_PROGRESS : 'Approve'}
+                {approveIsLoading ? IN_PROGRESS : 'Approve'}
               </FilledButton>
             )}
           </>
