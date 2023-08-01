@@ -102,7 +102,7 @@ export const REGEX_NUMBER_VALID = /^[0-9]*\.?[0-9]*$/;
 
 //  Pool Info
 export const POOL_CONTRACT_ADDRESS =
-  "0xDA01894d0D5AA426bFEfC4761CBAd4A14510AD07";
+  "0x3e6b9a075ba6C31c90722457b4970d6aa2f121e9";
 export const POOL_CONTRACT_ABI = [
   {
     inputs: [
@@ -1200,10 +1200,17 @@ export const USDC_DECIMAL = 6;
 
 //  Peko info
 export const PEKO_CONTRACT_ADDRESS =
-  "0x96E422C02149CBD21241F0E63da1f2E89371fDfc";
-export const PEKO_DECIMAL = 18;
+  "0xe73A423a55528245FB1bD183Fa73Af75979cFAeE";
+export const PEKO_DECIMAL = 6;
 export const PEKO_CONTRACT_ABI = [
-  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  {
+    inputs: [
+      { internalType: "string", name: "tokenName", type: "string" },
+      { internalType: "string", name: "tokenSymbol", type: "string" }
+    ],
+    stateMutability: "nonpayable",
+    type: "constructor"
+  },
   {
     anonymous: false,
     inputs: [
@@ -1264,13 +1271,6 @@ export const PEKO_CONTRACT_ABI = [
     type: "event"
   },
   {
-    inputs: [],
-    name: "INIT_TOTAL_SUPPLY",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function"
-  },
-  {
     inputs: [
       { internalType: "address", name: "owner", type: "address" },
       { internalType: "address", name: "spender", type: "address" }
@@ -1298,6 +1298,13 @@ export const PEKO_CONTRACT_ABI = [
     type: "function"
   },
   {
+    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
+    name: "burn",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
     inputs: [],
     name: "decimals",
     outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
@@ -1312,6 +1319,20 @@ export const PEKO_CONTRACT_ABI = [
     name: "decreaseAllowance",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
     stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "account", type: "address" }],
+    name: "getAirdrop",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "getOwner",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
     type: "function"
   },
   {
@@ -1346,6 +1367,16 @@ export const PEKO_CONTRACT_ABI = [
     type: "function"
   },
   {
+    inputs: [
+      { internalType: "address", name: "account", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" }
+    ],
+    name: "setAirdrop",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
     inputs: [],
     name: "symbol",
     outputs: [{ internalType: "string", name: "", type: "string" }],
@@ -1361,7 +1392,7 @@ export const PEKO_CONTRACT_ABI = [
   },
   {
     inputs: [
-      { internalType: "address", name: "to", type: "address" },
+      { internalType: "address", name: "recipient", type: "address" },
       { internalType: "uint256", name: "amount", type: "uint256" }
     ],
     name: "transfer",
@@ -1371,8 +1402,8 @@ export const PEKO_CONTRACT_ABI = [
   },
   {
     inputs: [
-      { internalType: "address", name: "from", type: "address" },
-      { internalType: "address", name: "to", type: "address" },
+      { internalType: "address", name: "sender", type: "address" },
+      { internalType: "address", name: "recipient", type: "address" },
       { internalType: "uint256", name: "amount", type: "uint256" }
     ],
     name: "transferFrom",
